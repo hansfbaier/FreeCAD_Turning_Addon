@@ -25,10 +25,10 @@
 import FreeCAD
 import Part
 import Path
-import PathScripts.PathLog as PathLog
-import PathScripts.PathOp as PathOp
+import Path.Log as PathLog
+import Path.Op.Base as PathOp
 import PathScripts.PathUtils as PathUtils
-# import PathScripts.PathGeom as PathGeom
+# import Path.Geom as PathGeom
 
 from PySide import QtCore
 
@@ -207,26 +207,50 @@ class ObjectOp(PathOp.ObjectOp):
         '''
         opTool = obj.ToolController.Tool
 
-        # only toolbits are supported
-        if isinstance(opTool, Path.Tool):
-            raise RuntimeError(translate('PathTurn', "Path Turn: Legacy Tools Not Supported "))
-
         # create a liblathe tool and assign the toolbit parameters
         turnTool = Tool()
 
-        # TODO: set some sensible default values or raise error if attribute not available
+        def get_tool_value(tool, prop_name):
+            """Return the numeric value of a tool property, or None if missing/unset."""
+            if hasattr(tool, prop_name):
+                val = getattr(tool, prop_name)
+                if val is not None and hasattr(val, 'Value'):
+                    return val.Value
+                elif val is not None:
+                    return val
+            return None
 
-        if hasattr(opTool, "TipAngle"):
-            turnTool.set_tip_angle(opTool.TipAngle.Value)
+        # FreeCAD 1.1 toolbits may not have lathe-specific properties.
+        # Try lathe properties first, then fall back to common milling properties.
+        tip_angle = get_tool_value(opTool, "TipAngle")
+        if tip_angle is None:
+            tip_angle = get_tool_value(opTool, "CuttingEdgeAngle")
+        if tip_angle is None:
+            tip_angle = 60.0
+        turnTool.set_tip_angle(tip_angle)
 
-        if hasattr(opTool, "EdgeLength"):
-            turnTool.set_edge_length(opTool.EdgeLength.Value)
+        edge_length = get_tool_value(opTool, "EdgeLength")
+        if edge_length is None:
+            edge_length = get_tool_value(opTool, "Diameter")
+        if edge_length is None:
+            edge_length = get_tool_value(opTool, "CuttingEdgeLength")
+        if edge_length is None:
+            edge_length = 10.0
+        turnTool.set_edge_length(edge_length)
 
-        if hasattr(opTool, "TipRadius"):
-            turnTool.set_nose_radius(opTool.TipRadius.Value)
+        tip_radius = get_tool_value(opTool, "TipRadius")
+        if tip_radius is None:
+            tip_radius = get_tool_value(opTool, "CornerRadius")
+        if tip_radius is None:
+            tip_radius = 0.4
+        turnTool.set_nose_radius(tip_radius)
 
-        if hasattr(opTool, "Rotation"):
-            turnTool.set_rotation(opTool.Rotation.Value)
+        rotation = get_tool_value(opTool, "Rotation")
+        if rotation is None:
+            rotation = 0.0
+        # LibLathe's set_rotation rejects 0 (bug), so skip it when default.
+        if rotation != 0.0:
+            turnTool.set_rotation(rotation)
 
         self.op_generate_gcode(obj, turnTool)
 

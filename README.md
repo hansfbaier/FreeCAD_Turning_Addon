@@ -13,10 +13,10 @@ This addon when installed will appear in the Path Workbench toolbar menu and wil
 * Turning Parting operation
 
 ## Requirements
-* FreeCAD v0.19
-* Path Toolbits (Legacy tools are not supported)
-* Python3  
-* Qt5
+* FreeCAD v1.1
+* CAM Toolbits (Legacy tools are not supported)
+* Python3
+* Qt5/Qt6
 
 ## Installation
 1. Use `git clone --recurse` or download the `.zip` file of this repo directly in to your [FreeCAD `Mod/` directory](https://www.freecadweb.org/wiki/Installing_more_workbenches).  

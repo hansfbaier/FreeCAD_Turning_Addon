@@ -43,15 +43,15 @@ def getIcon(iconName):
 
 
 def updateMenu(workbench):
-    if workbench == 'PathWorkbench':
+    if workbench == 'CAMWorkbench':
 
         print('FreeCAD Turning Addon loaded:', workbench)
 
         mw = FreeCADGui.getMainWindow()
         addonMenu = None
 
-        # Find the main path menu
-        pathMenu = mw.findChild(QtGui.QMenu, "&Path")
+        # Find the main CAM menu
+        pathMenu = mw.findChild(QtGui.QMenu, "&CAM")
 
         for menu in pathMenu.actions():
             if menu.text() == "Turning Addon":
@@ -84,7 +84,7 @@ def updateMenu(workbench):
 def createAction(menu, actionName):
     # space the actionName at caps
     text = re.sub(r"(\w)([A-Z])", r"\1 \2", actionName)
-    command = "Path_" + actionName
+    command = "CAM_" + actionName
     icon = "Path-" + actionName + ".svg"
 
     action = QtGui.QAction(menu)

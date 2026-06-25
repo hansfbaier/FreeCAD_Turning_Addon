@@ -212,7 +212,7 @@ class CommandPathTurnToolHelper:
 
 if FreeCAD.GuiUp:
     # register the FreeCAD command
-    FreeCADGui.addCommand('Path_TurnToolHelper', CommandPathTurnToolHelper())
+    FreeCADGui.addCommand('CAM_TurnToolHelper', CommandPathTurnToolHelper())
 
 
 
